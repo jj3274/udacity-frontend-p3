@@ -198,7 +198,11 @@ Player.prototype.handleInput = function(key) {
        this.sprite = playerImages[playerImageIndex];
      }
 
+     return;
   }
+
+  // Player moved to new tile, so do something for this movement
+  gameController.playerMoved();
 };
 
 // This is Gem class
@@ -242,6 +246,14 @@ GameController.prototype.init = function() {
     allGems.push(gem);
   }
 };
+
+GameController.prototype.playerMoved = function() {
+  for (var i = 0; i < allGems.length; i++) {
+    if (player.col === allGems[i].col && player.row === allGems[i].row) {
+      allGems[i].active = false; // player takes gem in the current tile
+    }
+  }
+}
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
