@@ -84,9 +84,9 @@ Enemy.prototype.update = function(dt) {
       this.initNewEnemy();
     }
 
-    if (this.isHitPlayer()) {
+    if (this.isHitPlayer()) { // Enemy caught the player, reset game
       player.score = 0;
-      player.initPlayer();
+      gameController.init();
     }
 };
 
@@ -139,11 +139,11 @@ Player.prototype.update = function() {
 
 Player.prototype.x = function() {
   return this.col * tileWidth;
-}
+};
 
 Player.prototype.y = function() {
   return this.row * tileHeight + playerYOffset;
-}
+};
 
 Player.prototype.render = function() {
 
@@ -180,7 +180,7 @@ Player.prototype.handleInput = function(key) {
       if (this.row === 1) { // you reach to the water, now reset the player's location
         this.score++; // you succeed, gain score
         if (this.highest < this.score) this.highest = this.score;
-        this.initPlayer();
+        gameController.init();
       }
       else { // otherwise, player can move up
         this.row--;
@@ -213,16 +213,34 @@ var Gem = function() {
 
 Gem.prototype.x = function() {
   return this.col * tileWidth + tileWidth / 2 - 15;
-}
+};
 
 Gem.prototype.y = function() {
   return this.row * tileHeight + tileHeight / 2 + 15;
-}
+};
 
 Gem.prototype.render = function() {
     if (this.active) {
       ctx.drawImage(Resources.get(this.sprite), this.x(), this.y(), 30, 50);
     }
+};
+
+// This is Game Controller class
+var GameController = function() {
+  this.init();
+};
+
+GameController.prototype.init = function() {
+  // Init player
+  player.initPlayer();
+
+  // Init Gem tiles
+  numOfGems = Math.floor((Math.random() * 6) + 2);
+  allGems = [];
+  for (var i = 0; i < numOfGems; i++) {
+    var gem = new Gem();
+    allGems.push(gem);
+  }
 };
 
 // Now instantiate your objects.
@@ -241,12 +259,10 @@ for (var i = 0; i < numOfEnemies; i++) {
 }
 var player = new Player();
 
-var numOfGems = Math.floor((Math.random() * 6) + 2);
-var allGems = [];
-for (var i = 0; i < numOfGems; i++) {
-  var gem = new Gem();
-  allGems.push(gem);
-}
+var numOfGems;
+var allGems;
+
+var gameController = new GameController();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
