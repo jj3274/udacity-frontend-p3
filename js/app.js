@@ -39,6 +39,7 @@ var minSpeed = 3,
     maxSpeed = 6;
 var enemyYOffset = -20,
     playerYOffset = -10;
+var hitOffset = 20;
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -52,9 +53,9 @@ var Enemy = function() {
 };
 
 Enemy.prototype.initNewEnemy = function() {
-    this.x = tileWidth * (-1);
-    var enemyColLocation = Math.floor((Math.random() * 3) + 1) // random number: 1, 2, or 3
-    this.y = enemyColLocation * tileHeight + enemyYOffset;
+    this.col = -1;
+    this.row = Math.floor((Math.random() * 3) + 1) // random number: 1, 2, or 3
+//    this.y = enemyColLocation * tileHeight + enemyYOffset;
     this.speed = Math.floor((Math.random() * (maxSpeed - minSpeed)) + minSpeed); // speed : 3 ~ 6 col moves / sec
 }
 
@@ -64,15 +65,39 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    this.x += dt * tileWidth * this.speed;
-    if (this.x > numRows * tileWidth) {
+    this.col += dt * this.speed;
+    if (this.col > numRows) {
       this.initNewEnemy();
+    }
+
+    if (this.isHit()) {
+      player.initPlayer();
     }
 };
 
+Enemy.prototype.location = function() {
+  return {"x": this.col * tileWidth, "y": this.row * tileHeight + enemyYOffset};
+}
+
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    var location = this.location();
+    ctx.drawImage(Resources.get(this.sprite), location.x, location.y);
+};
+
+// Draw the enemy on the screen, required method for game
+Enemy.prototype.isHit = function() {
+  if (player.row === this.row) { // Player and Enemy are in the same row,
+    var playerXCenter = player.location().x + tileWidth / 2;
+    var enemyXCenter = this.location().x + tileWidth / 2;
+
+    if ((enemyXCenter - hitOffset) < playerXCenter && // Emeny hits Player's location
+      playerXCenter < (enemyXCenter + hitOffset)) {
+      return true;
+    }
+  }
+
+    return false;
 };
 
 // Now write your own player class
@@ -92,8 +117,13 @@ Player.prototype.update = function() {
 
 };
 
+Player.prototype.location = function() {
+  return {"x": this.col * tileWidth, "y": this.row * tileHeight + playerYOffset};
+}
+
 Player.prototype.render = function() {
-  ctx.drawImage(Resources.get(this.sprite), this.col * tileWidth, this.row * tileHeight + playerYOffset);
+  var location = this.location();
+  ctx.drawImage(Resources.get(this.sprite), location.x, location.y);
 };
 
 Player.prototype.handleInput = function(key) {
@@ -123,9 +153,6 @@ Player.prototype.handleInput = function(key) {
       break;
 
     default:
-
-  }
-  if (key === 'left') {
 
   }
 };
