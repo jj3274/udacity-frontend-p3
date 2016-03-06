@@ -42,6 +42,15 @@ var enemyYOffset = -20,   // Enemy Bug's Y-coordinate offset for display
 var hitOffset = 20;       // Enemy and Player's Center Hit Offset,
  // e.g., if hitOffset = 0, then Enemy's center should match to Player's center coordinate to hit
 
+var playerImages = [
+         'images/char-boy.png',
+         'images/char-cat-girl.png',
+         'images/char-horn-girl.png',
+         'images/char-pink-girl.png',
+         'images/char-princess-girl.png'
+     ];
+
+
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -132,9 +141,18 @@ Player.prototype.y = function() {
 }
 
 Player.prototype.render = function() {
+  // draw player character
   ctx.drawImage(Resources.get(this.sprite), this.x(), this.y());
+
+  // draw current score / highest score
   ctx.font="20px Georgia";
   ctx.clearRect(0, 0, 505, 50);
+
+  for (var i = 0; i < playerImages.length; i++) {
+    ctx.fillText((i+1), i * 50 + 120, 35);
+    ctx.drawImage(Resources.get(playerImages[i]), i * 50 + 130, 0, 30, 50);
+  }
+
   ctx.fillText("Score: " + this.score, 10, 40);
   ctx.fillText("Highest: " + this.highest, 400, 40);
 };
@@ -168,12 +186,23 @@ Player.prototype.handleInput = function(key) {
       break;
 
     default:
+     if ('1' <= key && key <= '5') {
+       var playerImageIndex = key - '1';
+       this.sprite = playerImages[playerImageIndex];
+     }
 
   }
 };
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
+
+Resources.load([
+  'images/char-cat-girl.png',
+  'images/char-horn-girl.png',
+  'images/char-pink-girl.png',
+  'images/char-princess-girl.png'
+]);
 
 var numOfEnemies = 3;
 var allEnemies = [];
@@ -184,7 +213,6 @@ for (var i = 0; i < numOfEnemies; i++) {
 }
 var player = new Player();
 
-
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
@@ -192,7 +220,12 @@ document.addEventListener('keyup', function(e) {
         37: 'left',
         38: 'up',
         39: 'right',
-        40: 'down'
+        40: 'down',
+        49: '1',
+        50: '2',
+        51: '3',
+        52: '4',
+        53: '5'
     };
 
     player.handleInput(allowedKeys[e.keyCode]);
