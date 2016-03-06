@@ -71,6 +71,7 @@ Enemy.prototype.update = function(dt) {
     }
 
     if (this.isHitPlayer()) {
+      player.score = 0;
       player.initPlayer();
     }
 };
@@ -109,6 +110,8 @@ Enemy.prototype.isHitPlayer = function() {
 var Player = function() {
   this.sprite = 'images/char-boy.png';
   this.initPlayer();
+  this.score = 0;
+  this.highest = 0;
 };
 
 Player.prototype.initPlayer = function() {
@@ -130,6 +133,10 @@ Player.prototype.y = function() {
 
 Player.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x(), this.y());
+  ctx.font="20px Georgia";
+  ctx.clearRect(0, 0, 505, 50);
+  ctx.fillText("Score: " + this.score, 10, 40);
+  ctx.fillText("Highest: " + this.highest, 400, 40);
 };
 
 Player.prototype.handleInput = function(key) {
@@ -146,6 +153,8 @@ Player.prototype.handleInput = function(key) {
       break;
     case 'up':
       if (this.row === 1) { // you reach to the water, now reset the player's location
+        this.score++; // you succeed, gain score
+        if (this.highest < this.score) this.highest = this.score;
         this.initPlayer();
       }
       else { // otherwise, player can move up
