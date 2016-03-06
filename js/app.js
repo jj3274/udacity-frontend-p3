@@ -31,12 +31,21 @@ Once you have completed implementing the Player and Enemy, you should instantiat
 - Creating a new Player object
 - Creating several new Enemies objects and placing them in an array called allEnemies
 */
+
+// Customizable Game Setting
+var minSpeed = 2,    // Enemy Bug's min speed
+    maxSpeed = 6;    // Enemy Bug's max speed
+var scopePointForReachToWater = 10,  // score collection point when a player reaches to water
+    scopePointForGemCollection = 2;  // score collection point when a player collects a gem
+var minNumOfGem = 2,  // minimum number of gem in the game
+    maxNumOfGem = 8;  // maximum number of gem in the game
+var numOfEnemies = 3; // number of enemies that will appear at the same time
+
+// Constant Variables
 var tileHeight = 83; // Tile's Height (Col)
 var tileWidth = 101; // Tile's Width (Row)
 var numRows = 6,     // Num of Rows
     numCols = 5;     // Num of Cols
-var minSpeed = 2,    // Enemy Bug's min speed
-    maxSpeed = 6;    // Enemy Bug's max speed
 var enemyYOffset = -20,   // Enemy Bug's Y-coordinate offset for display
     playerYOffset = -10;  // Player's Y-coordinate offset for display
 var hitOffset = 20;       // Enemy and Player's Center Hit Offset,
@@ -54,7 +63,6 @@ var gemImages = [
         'images/Gem Green.png',
         'images/Gem Orange.png'
     ];
-
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -84,7 +92,7 @@ Enemy.prototype.update = function(dt) {
       this.initNewEnemy();
     }
 
-    if (this.isHitPlayer()) { // Enemy caught the player, reset game
+    if (this.isCollide()) { // Enemy caught the player, reset game
       player.score = 0;
       gameController.init();
     }
@@ -104,7 +112,7 @@ Enemy.prototype.render = function() {
 };
 
 // Draw the enemy on the screen, required method for game
-Enemy.prototype.isHitPlayer = function() {
+Enemy.prototype.isCollide = function() {
   if (player.row === this.row) { // Player and Enemy are in the same row,
     var playerXCenter = player.x() + tileWidth / 2;
     var enemyXCenter = this.x() + tileWidth / 2;
@@ -130,7 +138,7 @@ var Player = function() {
 
 Player.prototype.initPlayer = function() {
   this.col = 2;
-  this.row = 4;
+  this.row = 5;
 };
 
 Player.prototype.update = function() {
@@ -151,7 +159,7 @@ Player.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x(), this.y());
 
   ctx.font="20px Georgia";
-  ctx.clearRect(0, 0, 505, 50);
+  ctx.clearRect(0, 0, 505, 50);  // clear score board and player icon panel
 
   // draw player icons
   for (var i = 0; i < playerImages.length; i++) {
@@ -161,7 +169,7 @@ Player.prototype.render = function() {
 
   // draw current score / highest score
   ctx.fillText("Score: " + this.score, 10, 40);
-  ctx.fillText("Highest: " + this.highest, 400, 40);
+  ctx.fillText("Highest: " + this.highest, 380, 40);
 };
 
 Player.prototype.handleInput = function(key) {
@@ -178,7 +186,7 @@ Player.prototype.handleInput = function(key) {
       break;
     case 'up':
       if (this.row === 1) { // you reach to the water, now reset the player's location
-        this.score++; // you succeed, gain score
+        this.score += scopePointForReachToWater; // you succeed, gain score
         if (this.highest < this.score) this.highest = this.score;
         gameController.init();
       }
@@ -239,7 +247,7 @@ GameController.prototype.init = function() {
   player.initPlayer();
 
   // Init Gem tiles
-  numOfGems = Math.floor((Math.random() * 6) + 2);
+  numOfGems = Math.floor((Math.random() * (maxNumOfGem - minNumOfGem + 1)) + minNumOfGem);
   allGems = [];
   for (var i = 0; i < numOfGems; i++) {
     var gem = new Gem();
@@ -251,6 +259,7 @@ GameController.prototype.playerMoved = function() {
   for (var i = 0; i < allGems.length; i++) {
     if (player.col === allGems[i].col && player.row === allGems[i].row) {
       allGems[i].active = false; // player takes gem in the current tile
+      player.score += scopePointForGemCollection; // add score per the collected gem.
     }
   }
 }
@@ -262,7 +271,6 @@ GameController.prototype.playerMoved = function() {
 Resources.load(playerImages);
 Resources.load(gemImages);
 
-var numOfEnemies = 3;
 var allEnemies = [];
 
 for (var i = 0; i < numOfEnemies; i++) {
