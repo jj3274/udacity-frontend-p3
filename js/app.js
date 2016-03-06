@@ -49,6 +49,11 @@ var playerImages = [
          'images/char-pink-girl.png',
          'images/char-princess-girl.png'
      ];
+var gemImages = [
+        'images/Gem Blue.png',
+        'images/Gem Green.png',
+        'images/Gem Orange.png'
+    ];
 
 
 // Enemies our player must avoid
@@ -141,18 +146,20 @@ Player.prototype.y = function() {
 }
 
 Player.prototype.render = function() {
+
   // draw player character
   ctx.drawImage(Resources.get(this.sprite), this.x(), this.y());
 
-  // draw current score / highest score
   ctx.font="20px Georgia";
   ctx.clearRect(0, 0, 505, 50);
 
+  // draw player icons
   for (var i = 0; i < playerImages.length; i++) {
     ctx.fillText((i+1), i * 50 + 120, 35);
     ctx.drawImage(Resources.get(playerImages[i]), i * 50 + 130, 0, 30, 50);
   }
 
+  // draw current score / highest score
   ctx.fillText("Score: " + this.score, 10, 40);
   ctx.fillText("Highest: " + this.highest, 400, 40);
 };
@@ -193,16 +200,37 @@ Player.prototype.handleInput = function(key) {
 
   }
 };
+
+// This is Gem class
+var Gem = function() {
+  var gemImageIndex = Math.floor(Math.random() * gemImages.length) // random number: 1, 2, or 3
+
+  this.sprite = gemImages[gemImageIndex];
+  this.row = Math.floor((Math.random() * 3) + 1); // 1, 2, 3
+  this.col = Math.floor(Math.random() * 5); // 0, 1, 2, 3, 4
+  this.active = true;
+};
+
+Gem.prototype.x = function() {
+  return this.col * tileWidth + tileWidth / 2 - 15;
+}
+
+Gem.prototype.y = function() {
+  return this.row * tileHeight + tileHeight / 2 + 15;
+}
+
+Gem.prototype.render = function() {
+    if (this.active) {
+      ctx.drawImage(Resources.get(this.sprite), this.x(), this.y(), 30, 50);
+    }
+};
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
-Resources.load([
-  'images/char-cat-girl.png',
-  'images/char-horn-girl.png',
-  'images/char-pink-girl.png',
-  'images/char-princess-girl.png'
-]);
+Resources.load(playerImages);
+Resources.load(gemImages);
 
 var numOfEnemies = 3;
 var allEnemies = [];
@@ -212,6 +240,13 @@ for (var i = 0; i < numOfEnemies; i++) {
   allEnemies.push(enemy);
 }
 var player = new Player();
+
+var numOfGems = Math.floor((Math.random() * 6) + 2);
+var allGems = [];
+for (var i = 0; i < numOfGems; i++) {
+  var gem = new Gem();
+  allGems.push(gem);
+}
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.

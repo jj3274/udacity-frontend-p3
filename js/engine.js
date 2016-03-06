@@ -144,6 +144,13 @@ var Engine = (function(global) {
      * on your enemy and player entities within app.js
      */
     function renderEntities() {
+
+        /* Additional Functionality
+         * Collectables: you can add gems to the game, allowing the player to collect them to make the game more interesting
+         */
+        allGems.forEach(function(gem) {
+            gem.render();
+        });
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
