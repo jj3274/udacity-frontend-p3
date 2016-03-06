@@ -32,33 +32,33 @@ Once you have completed implementing the Player and Enemy, you should instantiat
 - Creating several new Enemies objects and placing them in an array called allEnemies
 */
 
-// Customizable Game Setting
-var minSpeed = 2,    // Enemy Bug's min speed
-    maxSpeed = 6;    // Enemy Bug's max speed
-var scopePointForReachToWater = 10,  // score collection point when a player reaches to water
-    scopePointForGemCollection = 2;  // score collection point when a player collects a gem
-var minNumOfGem = 2,  // minimum number of gem in the game
-    maxNumOfGem = 8;  // maximum number of gem in the game
-var numOfEnemies = 3; // number of enemies that will appear at the same time
+// Customizable Constants for Game Setting
+var ENEMY_MIN_SPEED = 2,    // Enemy Bug's min speed
+    ENEMY_MAX_SPEED = 6;    // Enemy Bug's max speed
+var SCORE_POINT_FOR_REACH_TO_WATER = 10,  // score collection point when a player reaches to water
+    SCORE_POINT_FOR_GEM_COLLECTION = 2;  // score collection point when a player collects a gem
+var MIN_NUM_OF_GEMS = 2,  // minimum number of gem in the game
+    MAX_NUM_OF_GEMS = 8;  // maximum number of gem in the game
+var NUM_OF_ENEMIES = 3; // number of enemies that will appear at the same time
+var COLLIDE_CENTER_OFFSET = 20;       // Enemy and Player's Center Hit Offset,
+// e.g., if COLLIDE_CENTER_OFFSET = 0, then Enemy's center should exactly match to Player's center coordinate to collide
 
-// Constant Variables
-var tileHeight = 83; // Tile's Height (Col)
-var tileWidth = 101; // Tile's Width (Row)
-var numRows = 6,     // Num of Rows
-    numCols = 5;     // Num of Cols
-var enemyYOffset = -20,   // Enemy Bug's Y-coordinate offset for display
-    playerYOffset = -10;  // Player's Y-coordinate offset for display
-var hitOffset = 20;       // Enemy and Player's Center Hit Offset,
- // e.g., if hitOffset = 0, then Enemy's center should match to Player's center coordinate to hit
+// Constants Variables
+var TILE_HEIGHT = 83; // Tile's Height (Col)
+var TILE_WIDTH = 101; // Tile's Width (Row)
+var NUM_OF_ROWS = 6,     // Num of Rows
+    NUM_OF_COLS = 5;     // Num of Cols
+var ENEMY_Y_OFFSET = -20,   // Enemy Bug's Y-coordinate offset for display
+    PLAYER_Y_OFFSET = -10;  // Player's Y-coordinate offset for display
 
-var playerImages = [
+var PLAYER_IMAGE_SET = [
          'images/char-boy.png',
          'images/char-cat-girl.png',
          'images/char-horn-girl.png',
          'images/char-pink-girl.png',
          'images/char-princess-girl.png'
      ];
-var gemImages = [
+var GEM_IMAGE_SET = [
         'images/Gem Blue.png',
         'images/Gem Green.png',
         'images/Gem Orange.png'
@@ -78,7 +78,7 @@ var Enemy = function() {
 Enemy.prototype.initNewEnemy = function() {
     this.col = -1;
     this.row = Math.floor((Math.random() * 3) + 1) // random number: 1, 2, or 3
-    this.speed = Math.floor((Math.random() * (maxSpeed - minSpeed)) + minSpeed); // speed : 3 ~ 6 col moves / sec
+    this.speed = Math.floor((Math.random() * (ENEMY_MAX_SPEED - ENEMY_MIN_SPEED)) + ENEMY_MIN_SPEED); // speed : 3 ~ 6 col moves / sec
 }
 
 // Update the enemy's position, required method for game
@@ -88,7 +88,7 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
     this.col += dt * this.speed;
-    if (this.col > numRows) {
+    if (this.col > NUM_OF_ROWS) {
       this.initNewEnemy();
     }
 
@@ -99,11 +99,11 @@ Enemy.prototype.update = function(dt) {
 };
 
 Enemy.prototype.x = function() {
-  return this.col * tileWidth;
+  return this.col * TILE_WIDTH;
 }
 
 Enemy.prototype.y = function() {
-  return this.row * tileHeight + enemyYOffset;
+  return this.row * TILE_HEIGHT + ENEMY_Y_OFFSET;
 }
 
 // Draw the enemy on the screen, required method for game
@@ -114,11 +114,11 @@ Enemy.prototype.render = function() {
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.isCollide = function() {
   if (player.row === this.row) { // Player and Enemy are in the same row,
-    var playerXCenter = player.x() + tileWidth / 2;
-    var enemyXCenter = this.x() + tileWidth / 2;
+    var playerXCenter = player.x() + TILE_WIDTH / 2;
+    var enemyXCenter = this.x() + TILE_WIDTH / 2;
 
-    if ((enemyXCenter - hitOffset) < playerXCenter && // Enemy hits Player's location
-      playerXCenter < (enemyXCenter + hitOffset)) {
+    if ((enemyXCenter - COLLIDE_CENTER_OFFSET) < playerXCenter && // Enemy hits Player's location
+      playerXCenter < (enemyXCenter + COLLIDE_CENTER_OFFSET)) {
       return true;
     }
   }
@@ -146,11 +146,11 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.x = function() {
-  return this.col * tileWidth;
+  return this.col * TILE_WIDTH;
 };
 
 Player.prototype.y = function() {
-  return this.row * tileHeight + playerYOffset;
+  return this.row * TILE_HEIGHT + PLAYER_Y_OFFSET;
 };
 
 Player.prototype.render = function() {
@@ -162,9 +162,9 @@ Player.prototype.render = function() {
   ctx.clearRect(0, 0, 505, 50);  // clear score board and player icon panel
 
   // draw player icons
-  for (var i = 0; i < playerImages.length; i++) {
+  for (var i = 0; i < PLAYER_IMAGE_SET.length; i++) {
     ctx.fillText((i+1), i * 50 + 120, 35);
-    ctx.drawImage(Resources.get(playerImages[i]), i * 50 + 130, 0, 30, 50);
+    ctx.drawImage(Resources.get(PLAYER_IMAGE_SET[i]), i * 50 + 130, 0, 30, 50);
   }
 
   // draw current score / highest score
@@ -180,13 +180,13 @@ Player.prototype.handleInput = function(key) {
       } // otherwise, it cannot move off screen
       break;
     case 'right':
-      if (this.col < (numCols - 1)) { // if player's col index < (numCols - 1)
+      if (this.col < (NUM_OF_COLS - 1)) { // if player's col index < (NUM_OF_COLS - 1)
         this.col++;
       } // otherwise, it cannot move off screen
       break;
     case 'up':
       if (this.row === 1) { // you reach to the water, now reset the player's location
-        this.score += scopePointForReachToWater; // you succeed, gain score
+        this.score += SCORE_POINT_FOR_REACH_TO_WATER; // you succeed, gain score
         if (this.highest < this.score) this.highest = this.score;
         gameController.init();
       }
@@ -195,7 +195,7 @@ Player.prototype.handleInput = function(key) {
       }
       break;
     case 'down':
-      if (this.row < (numRows - 1)) { // if player's row index < (numRows - 1)
+      if (this.row < (NUM_OF_ROWS - 1)) { // if player's row index < (NUM_OF_ROWS - 1)
         this.row++;
       } // otherwise, it cannot move off screen
       break;
@@ -203,7 +203,7 @@ Player.prototype.handleInput = function(key) {
     default:
      if ('1' <= key && key <= '5') {
        var playerImageIndex = key - '1';
-       this.sprite = playerImages[playerImageIndex];
+       this.sprite = PLAYER_IMAGE_SET[playerImageIndex];
      }
 
      return;
@@ -215,20 +215,20 @@ Player.prototype.handleInput = function(key) {
 
 // This is Gem class
 var Gem = function() {
-  var gemImageIndex = Math.floor(Math.random() * gemImages.length) // random number: 1, 2, or 3
+  var gemImageIndex = Math.floor(Math.random() * GEM_IMAGE_SET.length) // random number: 1, 2, or 3
 
-  this.sprite = gemImages[gemImageIndex];
+  this.sprite = GEM_IMAGE_SET[gemImageIndex];
   this.row = Math.floor((Math.random() * 3) + 1); // 1, 2, 3
   this.col = Math.floor(Math.random() * 5); // 0, 1, 2, 3, 4
   this.active = true;
 };
 
 Gem.prototype.x = function() {
-  return this.col * tileWidth + tileWidth / 2 - 15;
+  return this.col * TILE_WIDTH + TILE_WIDTH / 2 - 15;
 };
 
 Gem.prototype.y = function() {
-  return this.row * tileHeight + tileHeight / 2 + 15;
+  return this.row * TILE_HEIGHT + TILE_HEIGHT / 2 + 15;
 };
 
 Gem.prototype.render = function() {
@@ -247,7 +247,7 @@ GameController.prototype.init = function() {
   player.initPlayer();
 
   // Init Gem tiles
-  numOfGems = Math.floor((Math.random() * (maxNumOfGem - minNumOfGem + 1)) + minNumOfGem);
+  numOfGems = Math.floor((Math.random() * (MAX_NUM_OF_GEMS - MIN_NUM_OF_GEMS + 1)) + MIN_NUM_OF_GEMS);
   allGems = [];
   for (var i = 0; i < numOfGems; i++) {
     var gem = new Gem();
@@ -259,7 +259,7 @@ GameController.prototype.playerMoved = function() {
   for (var i = 0; i < allGems.length; i++) {
     if (player.col === allGems[i].col && player.row === allGems[i].row) {
       allGems[i].active = false; // player takes gem in the current tile
-      player.score += scopePointForGemCollection; // add score per the collected gem.
+      player.score += SCORE_POINT_FOR_GEM_COLLECTION; // add score per the collected gem.
     }
   }
 }
@@ -268,12 +268,12 @@ GameController.prototype.playerMoved = function() {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
-Resources.load(playerImages);
-Resources.load(gemImages);
+Resources.load(PLAYER_IMAGE_SET);
+Resources.load(GEM_IMAGE_SET);
 
 var allEnemies = [];
 
-for (var i = 0; i < numOfEnemies; i++) {
+for (var i = 0; i < NUM_OF_ENEMIES; i++) {
   var enemy = new Enemy();
   allEnemies.push(enemy);
 }
