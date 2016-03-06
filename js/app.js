@@ -37,7 +37,8 @@ var numRows = 6,
     numCols = 5;
 var minSpeed = 3,
     maxSpeed = 6;
-var enemyYOffset = -20;
+var enemyYOffset = -20,
+    playerYOffset = -10;
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -78,7 +79,13 @@ Enemy.prototype.render = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
+  this.sprite = 'images/char-boy.png';
+  this.initPlayer();
+};
 
+Player.prototype.initPlayer = function() {
+  this.col = 2;
+  this.row = 4;
 };
 
 Player.prototype.update = function() {
@@ -86,11 +93,41 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.render = function() {
-
+  ctx.drawImage(Resources.get(this.sprite), this.col * tileWidth, this.row * tileHeight + playerYOffset);
 };
 
 Player.prototype.handleInput = function(key) {
+  switch (key) {
+    case 'left':
+      if (this.col > 0) { // if player's col index > 0
+        this.col--;
+      } // otherwise, it cannot move off screen
+      break;
+    case 'right':
+      if (this.col < (numCols - 1)) { // if player's col index < (numCols - 1)
+        this.col++;
+      } // otherwise, it cannot move off screen
+      break;
+    case 'up':
+      if (this.row === 1) { // you reach to the water, now reset the player's location
+        this.initPlayer();
+      }
+      else { // otherwise, player can move up
+        this.row--;
+      }
+      break;
+    case 'down':
+      if (this.row < (numRows - 1)) { // if player's row index < (numRows - 1)
+        this.row++;
+      } // otherwise, it cannot move off screen
+      break;
 
+    default:
+
+  }
+  if (key === 'left') {
+
+  }
 };
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
