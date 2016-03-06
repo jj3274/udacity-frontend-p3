@@ -31,15 +31,16 @@ Once you have completed implementing the Player and Enemy, you should instantiat
 - Creating a new Player object
 - Creating several new Enemies objects and placing them in an array called allEnemies
 */
-var tileHeight = 83;
-var tileWidth = 101;
-var numRows = 6,
-    numCols = 5;
-var minSpeed = 3,
-    maxSpeed = 6;
-var enemyYOffset = -20,
-    playerYOffset = -10;
-var hitOffset = 20;
+var tileHeight = 83; // Tile's Height (Col)
+var tileWidth = 101; // Tile's Width (Row)
+var numRows = 6,     // Num of Rows
+    numCols = 5;     // Num of Cols
+var minSpeed = 2,    // Enemy Bug's min speed
+    maxSpeed = 6;    // Enemy Bug's max speed
+var enemyYOffset = -20,   // Enemy Bug's Y-coordinate offset for display
+    playerYOffset = -10;  // Player's Y-coordinate offset for display
+var hitOffset = 20;       // Enemy and Player's Center Hit Offset,
+ // e.g., if hitOffset = 0, then Enemy's center should match to Player's center coordinate to hit
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -55,7 +56,6 @@ var Enemy = function() {
 Enemy.prototype.initNewEnemy = function() {
     this.col = -1;
     this.row = Math.floor((Math.random() * 3) + 1) // random number: 1, 2, or 3
-//    this.y = enemyColLocation * tileHeight + enemyYOffset;
     this.speed = Math.floor((Math.random() * (maxSpeed - minSpeed)) + minSpeed); // speed : 3 ~ 6 col moves / sec
 }
 
@@ -70,34 +70,37 @@ Enemy.prototype.update = function(dt) {
       this.initNewEnemy();
     }
 
-    if (this.isHit()) {
+    if (this.isHitPlayer()) {
       player.initPlayer();
     }
 };
 
-Enemy.prototype.location = function() {
-  return {"x": this.col * tileWidth, "y": this.row * tileHeight + enemyYOffset};
+Enemy.prototype.x = function() {
+  return this.col * tileWidth;
+}
+
+Enemy.prototype.y = function() {
+  return this.row * tileHeight + enemyYOffset;
 }
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    var location = this.location();
-    ctx.drawImage(Resources.get(this.sprite), location.x, location.y);
+    ctx.drawImage(Resources.get(this.sprite), this.x(), this.y());
 };
 
 // Draw the enemy on the screen, required method for game
-Enemy.prototype.isHit = function() {
+Enemy.prototype.isHitPlayer = function() {
   if (player.row === this.row) { // Player and Enemy are in the same row,
-    var playerXCenter = player.location().x + tileWidth / 2;
-    var enemyXCenter = this.location().x + tileWidth / 2;
+    var playerXCenter = player.x() + tileWidth / 2;
+    var enemyXCenter = this.x() + tileWidth / 2;
 
-    if ((enemyXCenter - hitOffset) < playerXCenter && // Emeny hits Player's location
+    if ((enemyXCenter - hitOffset) < playerXCenter && // Enemy hits Player's location
       playerXCenter < (enemyXCenter + hitOffset)) {
       return true;
     }
   }
 
-    return false;
+  return false;
 };
 
 // Now write your own player class
@@ -117,13 +120,16 @@ Player.prototype.update = function() {
 
 };
 
-Player.prototype.location = function() {
-  return {"x": this.col * tileWidth, "y": this.row * tileHeight + playerYOffset};
+Player.prototype.x = function() {
+  return this.col * tileWidth;
+}
+
+Player.prototype.y = function() {
+  return this.row * tileHeight + playerYOffset;
 }
 
 Player.prototype.render = function() {
-  var location = this.location();
-  ctx.drawImage(Resources.get(this.sprite), location.x, location.y);
+  ctx.drawImage(Resources.get(this.sprite), this.x(), this.y());
 };
 
 Player.prototype.handleInput = function(key) {
