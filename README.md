@@ -14,3 +14,4 @@ The goal of the player is to reach the water, without colliding into any one of 
 The player can also collect the gems while playing. Each gem collection is 2 point. The score is reset when the player collides with an enemy. The highest score is recorded and shown on the top right.
 
 5 player characters are provided. User can switch the player character using keypad between 1 and 5.
+.
